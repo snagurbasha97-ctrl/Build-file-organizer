@@ -1,0 +1,46 @@
+
+from pathlib import Path
+import shutil
+
+def organize_files(folder_path):
+    folder = Path(folder_path)
+
+    if not folder.exists() or not folder.is_dir():
+        print("Invalid folder path!")
+        return
+
+    for file in folder.iterdir():
+
+        # Skip folders
+        if file.is_dir():
+            continue
+
+        # Get file extension
+        extension = file.suffix.lower().replace(".", "")
+
+        if extension:
+            folder_name = extension.upper()
+        else:
+            folder_name = "Others"
+
+        # Create destination folder
+        destination = folder / folder_name
+        destination.mkdir(exist_ok=True)
+
+        # Handle duplicate filenames safely
+        new_file = destination / file.name
+        count = 1
+
+        while new_file.exists():
+            new_file = destination / f"{file.stem}_{count}{file.suffix}"
+            count += 1
+
+        # Move file
+        shutil.move(str(file), str(new_file))
+
+    print("Files organized successfully!")
+
+
+# Main program
+path = input("Enter folder path: ")
+organize_files(path)
